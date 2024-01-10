@@ -507,3 +507,45 @@ func (i *AppResponseIncluded) GameCenterEnabledVersion() *GameCenterEnabledVersi
 func (i *AppResponseIncluded) PerfPowerMetric() *PerfPowerMetric {
 	return extractIncludedPerfPowerMetric(i.inner)
 }
+
+// CustomerReview defines model for a single customer review.
+type CustomerReview struct {
+	Body             *string `json:"body,omitempty"`
+	CreatedDate      *string `json:"createdDate,omitempty"`
+	Rating           *int    `json:"rating,omitempty"`
+	ReviewerNickname *string `json:"reviewerNickname,omitempty"`
+	Territory        *string `json:"territory,omitempty"`
+	Title            *string `json:"title,omitempty"`
+	// Add other fields as needed
+}
+
+// CustomerReviewsResponse defines the response structure for customer reviews.
+type CustomerReviewsResponse struct {
+	Data  []CustomerReview   `json:"data"`
+	Links PagedDocumentLinks `json:"links"`
+	Meta  PagingInformation  `json:"meta,omitempty"`
+}
+
+// ListCustomerReviewsQuery defines the query parameters for listing customer reviews.
+type ListCustomerReviewsQuery struct {
+	FieldsCustomerReviewResponses []string `url:"fields[customerReviewResponses],omitempty"`
+	FieldsCustomerReviews         []string `url:"fields[customerReviews],omitempty"`
+	FilterRating                  []string `url:"filter[rating],omitempty"`
+	Include                       []string `url:"include,omitempty"`
+	Limit                         int      `url:"limit,omitempty"`
+	Sort                          []string `url:"sort,omitempty"`
+	FilterTerritory               []string `url:"filter[territory],omitempty"`
+	ExistsPublishedResponse       []string `url:"exists[publishedResponse],omitempty"`
+}
+
+// ListCustomerReviews lists the customer reviews for a specific app.
+func (s *AppsService) ListCustomerReviews(ctx context.Context, appID string, params *ListCustomerReviewsQuery) (*CustomerReviewsResponse, *Response, error) {
+	url := fmt.Sprintf("apps/%s/customerReviews", appID)
+	res := new(CustomerReviewsResponse)
+	resp, err := s.client.get(ctx, url, params, res)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	return res, resp, err
+}
